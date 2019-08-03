@@ -92,16 +92,19 @@ echo "Current Hash: $new_hash"
 
 echo "Start Database Server"
 cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
+sudo swapoff -a && sudo swapon -a
 sudo systemctl start mariadb
 EOS
 
 echo "Start Database Server"
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
+sudo swapoff -a && sudo swapon -a
 sudo systemctl start torb.go
 EOS
 
 echo "Start Database Server"
 cat <<EOS | ssh $KEY_OPTION $USER@$WEB_SERVER sh
+sudo swapoff -a && sudo swapon -a
 sudo systemctl start h2o
 EOS
 
