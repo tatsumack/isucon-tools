@@ -1,0 +1,6 @@
+# ローカルに開発環境作るとき
+mysql -uroot
+mysql> CREATE USER isucon@'%' IDENTIFIED BY 'isucon';
+mysql> GRANT ALL on torb.* TO isucon@'%';
+mysql> CREATE USER isucon@'localhost' IDENTIFIED BY 'isucon';
+mysql> GRANT ALL on torb.* TO isucon@'localhost';
