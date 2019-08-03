@@ -1,0 +1,11 @@
+# 初期化処理
+curl -XGET localhost:9292/initialize
+
+# ユーザー系のリクエスト
+id=$(curl -XPOST localhost:9292/api/users --data '{ "nickname": "hoge", "login_name": "hoge", "password": "hoge"}' | jq '.id') # 新規作成
+curl -XPOST -c cookie.txt localhost:9292/api/actions/login --data '{"login_name": "hoge", "password": "hoge"}' # ログイン
+curl -XGET -b cookie.txt localhost:9292/api/users/$id
+curl -XGET -b cookie.txt localhost:9292/api/events
+curl -XGET -b cookie.txt localhost:9292/api/events/11
+sheet_num=$(curl -XPOST -b cookie.txt localhost:9292/api/events/11/actions/reserve --data '{"sheet_rank": "S"}' | jq '.sheet_num')
+curl -XDELETE -b cookie.txt "localhost:9292/api/events/11/sheets/S/$sheet_num/reservation"
