@@ -1,6 +1,8 @@
 #!/bin/sh
 set -ex
 
+sudo apt-get install yum
+
 # nginx
 sudo yum install nginx -y
 sudo systemctl enable nginx
