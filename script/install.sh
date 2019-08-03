@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-sudo apt-get install yum
+sudo apt-get install yum -y
 
 # nginx
 sudo yum install nginx -y
