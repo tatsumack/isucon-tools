@@ -1,0 +1,18 @@
+go get -u github.com/google/pprof
+
+```
+_ "net/http/pprof"
+
+func main() {
+	// pprof
+    go func() {
+        log.Println(http.ListenAndServe("localhost:6060", nil))
+    }()
+```
+
+//ベンチ実行直前に
+pprof -http=localhost:8080 /home/isucon/torb/webapp/go/torb http://localhost:6060/debug/pprof/profile?seconds=60 &
+
+//ベンチ後
+pprof /home/isucon/torb/webapp/go/torb /home/isucon/pprof/pprof.torb.samples.cpu.001.pb.gz
+peek main. -cum
