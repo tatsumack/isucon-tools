@@ -23,7 +23,3 @@
 - [ ] アプリケーション配下、/etc/配下をgit init
 - [ ] コードをリポジトリにpushする
 - [ ] ローカルで開発環境を構築(30分以上かかるなら諦める)
-- [ ] デプロイスクリプトを使えるようにする 
-  - https://github.com/tatsumack/isucon-preparation/blob/master/script/deploy.sh
-
-  
