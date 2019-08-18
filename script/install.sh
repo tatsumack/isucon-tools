@@ -8,6 +8,9 @@ sudo yum install nginx -y
 sudo systemctl enable nginx
 sudo systemctl start nginx
 
+# unzip
+sudo apt-get install unzip
+
 # alp
 cd /var/tmp/ && wget https://github.com/tkuchiki/alp/releases/download/v0.4.0/alp_linux_amd64.zip
 unzip alp_linux_amd64.zip
