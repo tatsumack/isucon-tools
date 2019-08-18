@@ -7,12 +7,15 @@
 - [ ] ssh鍵を登録する
 - [ ] alpをインストール
 - [ ] pt-query-digestをインストール
+- [ ] access_logをltsvにする
+- [ ] alp, slowqueryの計測する
 - [ ] デプロイスクリプトを使えるようにする 
   - https://github.com/tatsumack/isucon-preparation/blob/master/script/deploy.sh
 - [ ] ハードウェアの構成を調べる(CPU、メモリ)
 - [ ] 動作しているプロセスを確認しておおよその構成を理解する
 
 ## アプリケーション担当1
+- [ ] データサイズ確認 https://github.com/tatsumack/isucon-tools/blob/master/cmd/mysql
 - [ ] コードを読む
 - [ ] 実際に使ってみる
 - [ ] パスの一覧を共有
