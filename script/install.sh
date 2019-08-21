@@ -1,15 +1,11 @@
 #!/bin/sh
 set -ex
 
-sudo apt-get install yum -y
+sudo apt-get install -y nginx dstat unzip
 
 # nginx
-sudo yum install nginx -y
-sudo systemctl enable nginx
-sudo systemctl start nginx
-
-# unzip
-sudo apt-get install unzip
+# sudo systemctl enable nginx
+# sudo systemctl start nginx
 
 # alp
 cd /var/tmp/ && wget https://github.com/tkuchiki/alp/releases/download/v0.4.0/alp_linux_amd64.zip
@@ -23,7 +19,7 @@ mv ./percona-toolkit-3.0.13/bin/pt-query-digest /usr/local/bin
 
 # ssh
 cat << _EOS > /tmp/authorized_keys
-ssh-rsa hogehoge
+ssh-rsa hoge
 _EOS
 sudo cat /home/isucon/.ssh/authorized_keys >> /tmp/authorized_keys
 sudo mkdir -p /home/isucon/.ssh
