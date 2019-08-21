@@ -10,12 +10,12 @@ sudo apt-get install -y nginx dstat unzip
 # alp
 cd /var/tmp/ && wget https://github.com/tkuchiki/alp/releases/download/v0.4.0/alp_linux_amd64.zip
 unzip alp_linux_amd64.zip
-mv ./alp /usr/local/bin
+sudo mv ./alp /usr/local/bin
 
 # pt-query-digest
 cd /var/tmp && wget https://www.percona.com/downloads/percona-toolkit/3.0.13/binary/tarball/percona-toolkit-3.0.13_x86_64.tar.gz
 tar -zxvf percona-toolkit-3.0.13_x86_64.tar.gz
-mv ./percona-toolkit-3.0.13/bin/pt-query-digest /usr/local/bin
+sudo mv ./percona-toolkit-3.0.13/bin/pt-query-digest /usr/local/bin
 
 # ssh
 cat << _EOS > /tmp/authorized_keys
