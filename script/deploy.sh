@@ -11,101 +11,111 @@ set -x
 
 echo "Deploy script started."
 
-PROJECT_ROOT=/home/isucon/torb/webapp
+PROJECT_ROOT=/home/isucon/isubata/webapp
 
 LOG_BACKUP_DIR=/var/log/isucon
 
 USER=isucon
-KEY_OPTION="-i ~/.ssh/isucon8-qual"
+KEY_OPTION=""
 
-WEB_SERVER=150.95.133.1
-APP_SERVER=150.95.133.1
-DB_SERVER=150.95.133.1
+WEB_SERVERS="isu1 isu2 isu3"
+APP_SERVERS="isu1 isu2 isu3"
+DB_SERVER="isu1"
 
-BACKUP_TARGET_LIST="/var/lib/mysql/mysqld-slow.log /var/log/h2o/access.log /var/log/h2o/error.log"
+BACKUP_TARGET_LIST="/var/lib/mysql/mysqld-slow.log /var/log/nginx/access.log /var/log/nginx/error.log"
 
-# echo "Update Project"
-# cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
-# cd $PROJECT_ROOT
-# cd go
-# # export PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:$PATH
-# # export GOROOT=/home/isucon/local/go
-# PATH=/home/isucon/local/go/bin:/home/isucon/go/bin go version
-# PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:/usr/bin make build
-# EOS
-# exit
+BRANCH=$1
+if [ -z "$BRANCH" ]; then
+  BRANCH="master"
+fi
 
 # sed -n -r 's/^(LogFormat.*)(" combined)/\1 %D\2/p' /etc/httpd/conf/httpd.conf
 echo "Stop Web Server"
+for WEB_SERVER in $WEB_SERVERS
+do
 cat <<EOS | ssh $KEY_OPTION $USER@$WEB_SERVER sh
-sudo systemctl stop h2o
+sudo systemctl stop nginx
 EOS
+done
 
 echo "Stop Application Server"
+for APP_SERVER in $APP_SERVERS
+do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
-sudo systemctl stop torb.go
+sudo systemctl stop isubata.golang.service
 EOS
+done
 
 echo "Stop DataBase Server"
 cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
-sudo systemctl stop mariadb
+sudo systemctl stop mysql
 EOS
 
 echo "Get Current git hash"
+for APP_SERVER in $APP_SERVERS
+do
 hash=`cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 cd $PROJECT_ROOT
 git rev-parse --short HEAD
 EOS`
 echo "Current Hash: $hash"
-
-# LOG_DATE=`date +"%Y%m%d%H%M%S"`
+done
 LOG_DATE=`date +"%H%M%S"`
 echo "Backup App Server LOG"
 for LOG_PATH in $BACKUP_TARGET_LIST
 do
     LOG_FILE=`basename $LOG_PATH`
+for APP_SERVER in $APP_SERVERS
+do
     cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 sudo mkdir -p ${LOG_BACKUP_DIR}
 sudo mv $LOG_PATH ${LOG_BACKUP_DIR}/${LOG_FILE}_${LOG_DATE}_${hash}
 EOS
 done
-
+done
 echo "Current Hash: $hash"
-
 echo "Update Project"
+for APP_SERVER in $APP_SERVERS
+do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 cd $PROJECT_ROOT
-# git clean -fd
-# git reset --hard
-git pull origin master
+git clean -fd
+git reset --hard
+git fetch -p
+git checkout $BRANCH
+git pull --rebase
 cd go
 PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:/usr/bin make build
 EOS
-
+done
 echo "Get new git hash"
+for APP_SERVER in $APP_SERVERS
+do
 new_hash=`cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 cd $PROJECT_ROOT
 git rev-parse --short HEAD
 EOS`
 echo "Current Hash: $new_hash"
-
-
+done
 echo "Start Database Server"
 cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
 sudo swapoff -a && sudo swapon -a
-sudo systemctl start mariadb
+sudo systemctl start mysql
 EOS
-
-echo "Start Database Server"
+echo "Start App Server"
+for APP_SERVER in $APP_SERVERS
+do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 sudo swapoff -a && sudo swapon -a
-sudo systemctl start torb.go
+sudo systemctl start isubata.golang.service
 EOS
-
-echo "Start Database Server"
+done
+echo "Start Web Server"
+for WEB_SERVER in $WEB_SERVERS
+do
 cat <<EOS | ssh $KEY_OPTION $USER@$WEB_SERVER sh
 sudo swapoff -a && sudo swapon -a
-sudo systemctl start h2o
+sudo systemctl start nginx
 EOS
-
+done
 echo "Deploy script finished."
