@@ -21,7 +21,7 @@ sudo mv ./percona-toolkit-3.0.13/bin/pt-query-digest /usr/local/bin
 cat << _EOS > /tmp/authorized_keys
 ssh-rsa hoge
 _EOS
-sudo cat /home/isucon/.ssh/authorized_keys >> /tmp/authorized_keys
+sudo cat /tmp/authorized_keys >> /home/isucon/.ssh/authorized_keys
 sudo mkdir -p /home/isucon/.ssh
 sudo mv /tmp/authorized_keys /home/isucon/.ssh/
 sudo chown -R isucon.isucon /home/isucon/.ssh/
