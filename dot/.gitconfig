@@ -1,9 +1,5 @@
 [color]
         ui = true
-[pager]
-        show = diff-highlight | nkf -w -x | less
-        log = diff-highlight | nkf -w -x | less
-        diff = diff-highlight | nkf -w -x | less
 [alias]
         co = checkout
         graph = log --graph -C -M --pretty=format:\"<%h> %ad [%an] %Cgreen%d%Creset %s\" --all --date=short
