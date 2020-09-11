@@ -22,6 +22,7 @@ cat << _EOS > /tmp/authorized_keys
 ssh-rsa hoge
 _EOS
 sudo mkdir -p /home/isucon/.ssh
+chmod 700 /home/isucon/.ssh
 sudo cat /tmp/authorized_keys >> /home/isucon/.ssh/authorized_keys
 sudo mv /tmp/authorized_keys /home/isucon/.ssh/
 sudo chown -R isucon.isucon /home/isucon/.ssh/
