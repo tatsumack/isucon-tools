@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x
+set -ex
 
 # 前提
 #  SSHのパスなし認証が通ること
