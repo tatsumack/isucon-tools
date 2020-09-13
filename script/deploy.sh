@@ -1,13 +1,5 @@
 #!/bin/sh
-set -ex
-
-# 前提
-#  SSHのパスなし認証が通ること
-
-# memo
-# ssh -i ~/.ssh/isucon isucon@118.27.32.14
-# ssh -i ~/.ssh/isucon isucon@118.27.29.82
-# ssh -i ~/.ssh/isucon isucon@118.27.5.40    
+set -ex 
 
 echo "Deploy script started."
 
