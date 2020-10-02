@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-sudo apt-get install -y dstat unzip
+sudo apt-get install -y dstat unzip graphviz
 
 # alp
 cd /var/tmp/ && wget https://github.com/tkuchiki/alp/releases/download/v0.4.0/alp_linux_amd64.zip
