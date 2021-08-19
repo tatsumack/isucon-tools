@@ -18,6 +18,7 @@
 - [ ] ハードウェアの構成を調べる(CPU、メモリ)
 - [ ] 動作しているプロセスを確認しておおよその構成を理解する
 - [ ] SEE ALSO: https://gist.github.com/south37/d4a5a8158f49e067237c17d13ecab12a
+- [ ] Cloud Profiler仕込む
 
 ## アプリケーション担当1
 - [ ] データサイズ確認 https://github.com/tatsumack/isucon-tools/blob/master/cmd/mysql
