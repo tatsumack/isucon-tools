@@ -1,20 +1,20 @@
 #!/bin/sh
-set -ex 
+set -ex
 
 echo "Deploy script started."
 
-PROJECT_ROOT=/home/isucon/isubata/webapp
+PROJECT_ROOT=/home/isucon/webapp
 
 LOG_BACKUP_DIR=/var/log/isucon
 
 USER=isucon
-KEY_OPTION=""
+KEY_OPTION="-A"
 
-WEB_SERVERS="isu1 isu2 isu3"
-APP_SERVERS="isu1 isu2 isu3"
-DB_SERVER="isu1"
+WEB_SERVERS="isu03"
+APP_SERVERS="isu03"
+DB_SERVER="isu02"
 
-BACKUP_TARGET_LIST="/var/lib/mysql/mysqld-slow.log /var/log/nginx/access.log /var/log/nginx/error.log"
+BACKUP_TARGET_LIST="/var/log/nginx/access.log /var/log/nginx/error.log"
 
 BRANCH=$1
 if [ -z "$BRANCH" ]; then
@@ -34,7 +34,7 @@ echo "Stop Application Server"
 for APP_SERVER in $APP_SERVERS
 do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
-sudo systemctl stop isubata.golang.service
+sudo systemctl stop isucondition.go.service
 EOS
 done
 
@@ -52,6 +52,8 @@ git rev-parse --short HEAD
 EOS`
 echo "Current Hash: $hash"
 done
+
+set +e
 LOG_DATE=`date +"%H%M%S"`
 echo "Backup App Server LOG"
 for LOG_PATH in $BACKUP_TARGET_LIST
@@ -65,6 +67,13 @@ sudo mv $LOG_PATH ${LOG_BACKUP_DIR}/${LOG_FILE}_${LOG_DATE}_${hash}
 EOS
 done
 done
+
+cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
+sudo rm /var/log/mysql/mysql-slow.log
+EOS
+
+set -e
+
 echo "Current Hash: $hash"
 echo "Update Project"
 for APP_SERVER in $APP_SERVERS
@@ -77,9 +86,19 @@ git fetch -p
 git checkout $BRANCH
 git pull --rebase
 cd go
-PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:/usr/bin make build
+PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:/usr/bin go build -o isucondition main.go
 EOS
 done
+
+cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
+cd $PROJECT_ROOT
+git clean -fd
+git reset --hard
+git fetch -p
+git checkout $BRANCH
+git pull --rebase
+EOS
+
 echo "Get new git hash"
 for APP_SERVER in $APP_SERVERS
 do
@@ -99,7 +118,7 @@ for APP_SERVER in $APP_SERVERS
 do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 sudo swapoff -a && sudo swapon -a
-sudo systemctl start isubata.golang.service
+sudo systemctl start isucondition.go.service
 EOS
 done
 echo "Start Web Server"
