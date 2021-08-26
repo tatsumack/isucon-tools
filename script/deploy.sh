@@ -18,7 +18,8 @@ BACKUP_TARGET_LIST="/var/log/nginx/access.log /var/log/nginx/error.log"
 
 BRANCH=$1
 if [ -z "$BRANCH" ]; then
-  BRANCH="master"
+  echo "you must set branch"
+  exit 1
 fi
 
 # sed -n -r 's/^(LogFormat.*)(" combined)/\1 %D\2/p' /etc/httpd/conf/httpd.conf
