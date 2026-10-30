@@ -17,3 +17,19 @@ pprof -http=localhost:8080 /home/isucon/webapp/go/<binary> http://localhost:6060
 //ベンチ後
 pprof /home/isucon/webapp/go/<binary> /home/isucon/pprof/pprof.<binary>.samples.cpu.001.pb.gz
 peek main. -cum
+
+// Claude Codeに分析させる場合 (テキストで出力する)
+// ベンチ実行中にプロファイルをファイルに保存
+mkdir -p /home/isucon/pprof
+curl -o /home/isucon/pprof/cpu.pb.gz 'http://localhost:6060/debug/pprof/profile?seconds=60'
+
+// ベンチ後
+go tool pprof -top -cum /home/isucon/webapp/go/<binary> /home/isucon/pprof/cpu.pb.gz   # 重い関数の一覧
+go tool pprof -list 'main\.<func>' /home/isucon/webapp/go/<binary> /home/isucon/pprof/cpu.pb.gz   # 関数内の行ごとの時間
+go tool pprof -peek 'main\.' /home/isucon/webapp/go/<binary> /home/isucon/pprof/cpu.pb.gz   # 呼び出し元・呼び出し先
+
+// 修正前後の比較
+go tool pprof -top -diff_base /home/isucon/pprof/cpu_before.pb.gz /home/isucon/webapp/go/<binary> /home/isucon/pprof/cpu.pb.gz
+
+// Claude Codeへの依頼例
+// 「/home/isucon/pprof/cpu.pb.gz と ~/log/alp.log、~/log/mysql-slow.log を見てボトルネックを特定して」
