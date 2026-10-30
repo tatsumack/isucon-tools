@@ -3,13 +3,18 @@ set -ex
 
 echo "Deploy script started."
 
+# TODO: 当日の環境に合わせて書き換える
 PROJECT_ROOT=/home/isucon/webapp
+APP_DIR=go                     # PROJECT_ROOTからの相対パス
+APP_BINARY=isucondition        # go buildの出力名 (systemdのExecStartと合わせる)
+APP_SERVICE=isucondition.go.service
 
 LOG_BACKUP_DIR=/var/log/isucon
 
 USER=isucon
 KEY_OPTION="-A"
 
+# TODO: ~/.ssh/configのHost名
 WEB_SERVERS="isu03"
 APP_SERVERS="isu03"
 DB_SERVER="isu02"
@@ -35,7 +40,7 @@ echo "Stop Application Server"
 for APP_SERVER in $APP_SERVERS
 do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
-sudo systemctl stop isucondition.go.service
+sudo systemctl stop $APP_SERVICE
 EOS
 done
 
@@ -70,7 +75,7 @@ done
 done
 
 cat <<EOS | ssh $KEY_OPTION $USER@$DB_SERVER sh
-sudo rm /var/log/mysql/mysql-slow.log
+sudo rm -f /var/log/mysql/mysql-slow.log
 EOS
 
 set -e
@@ -86,8 +91,8 @@ git reset --hard
 git fetch -p
 git checkout $BRANCH
 git pull --rebase
-cd go
-PATH=/home/isucon/local/go/bin:/home/isucon/go/bin:/usr/bin go build -o isucondition main.go
+cd $APP_DIR
+PATH=/home/isucon/local/go/bin:/usr/local/go/bin:/home/isucon/go/bin:/usr/bin go build -o $APP_BINARY .
 EOS
 done
 
@@ -119,7 +124,7 @@ for APP_SERVER in $APP_SERVERS
 do
 cat <<EOS | ssh $KEY_OPTION $USER@$APP_SERVER sh
 sudo swapoff -a && sudo swapon -a
-sudo systemctl start isucondition.go.service
+sudo systemctl start $APP_SERVICE
 EOS
 done
 echo "Start Web Server"

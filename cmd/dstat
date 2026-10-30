@@ -1,1 +1,5 @@
 dstat -tpcdrmsngy
+
+# Ubuntu 24.04などdstatが無い環境
+vmstat 1
+iostat -x 1
