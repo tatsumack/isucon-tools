@@ -8,7 +8,6 @@ description: ISUCONの競技開始直後に、サーバ上のアプリのコー�
 ## 前提 (ユーザーが済ませておくこと)
 - `~/.ssh/config` の `isu1` `isu2` `isu3` の HostName をポータルのIPに書き換えてある (User isucon, ForwardAgent yes)
 - 当日のリポジトリ: `git@github.com:tatsumack/isucon2026.git` (private, 空)
-- 手元のcloneパス: `~/git/github.com/tatsumack/isucon2026`
 
 前提を満たしていなければ、ユーザーに伝えて止まる。
 
@@ -89,9 +88,11 @@ git status --short
 - 差分がある場合 (env.shのホスト固有の値など) は内容をユーザーに報告し、判断を仰ぐ。勝手に破棄しない
 
 ### 4. 手元にcloneしてClaude用の設定とdeploy.shを入れる
+クローン先はユーザーに確認する。
+
 ```
-git clone git@github.com:tatsumack/isucon2026.git ~/git/github.com/tatsumack/isucon2026
-cd ~/git/github.com/tatsumack/isucon2026
+git clone git@github.com:tatsumack/isucon2026.git <クローン先>
+cd <クローン先>
 mkdir -p .claude/skills
 cp -r <isucon-toolsのパス>/dot/claude/skills/bench-analyze .claude/skills/
 cp <isucon-toolsのパス>/script/deploy.sh ./deploy.sh
