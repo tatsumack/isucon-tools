@@ -1,6 +1,6 @@
 ---
 name: isucon-setup
-description: ISUCONの競技開始直後に、サーバ上のアプリのコードとミドルウェアの設定ファイルを当日のGitHubリポジトリに上げ、全サーバと手元を同じリポジトリで管理できる状態にする。「初動セットアップして」「/isucon-setup」などで使う。
+description: ISUCONの競技開始直後に、サーバ上のアプリのコードとミドルウェアの設定ファイルを当日のGitHubリポジトリに上げ、全サーバと手元を同じリポジトリで管理してdeploy.shでデプロイできる状態にする。「初動セットアップして」「/isucon-setup」などで使う。
 ---
 
 # 競技開始直後のリポジトリ作成
@@ -88,27 +88,56 @@ git status --short
 - `git status` が空なら isu1 と同じ状態。`git checkout -B main origin/main` で追跡ブランチを設定する
 - 差分がある場合 (env.shのホスト固有の値など) は内容をユーザーに報告し、判断を仰ぐ。勝手に破棄しない
 
-### 4. 手元にcloneしてClaude用の設定を入れる
+### 4. 手元にcloneしてClaude用の設定とdeploy.shを入れる
 ```
 git clone git@github.com:tatsumack/isucon2026.git ~/git/github.com/tatsumack/isucon2026
 cd ~/git/github.com/tatsumack/isucon2026
 mkdir -p .claude/skills
 cp -r <isucon-toolsのパス>/dot/claude/skills/bench-analyze .claude/skills/
+cp <isucon-toolsのパス>/script/deploy.sh ./deploy.sh
 echo "bench-results/" >> .gitignore
-git add -A && git commit -m "Claude Code用のスキルを追加" && git push
 ```
 
-その後、全サーバで `git pull` して手元と揃える。
+`deploy.sh` の先頭のTODOを手順1の調査結果で埋める。
+- `PROJECT_ROOT`: アプリのディレクトリ (通常 `/home/isucon/webapp`)
+- `APP_DIR`: Go実装のディレクトリ (`PROJECT_ROOT` からの相対パス)
+- `APP_BINARY`: systemdの `ExecStart` のバイナリ名と一致させる
+- `APP_SERVICE`: Go実装のsystemdサービス名
+- DBのサービス名が `mysql` 以外 (`mariadb` など) なら `systemctl stop/start mysql` の箇所も直す
 
-### 5. 報告する
+```
+git add -A && git commit -m "deploy.shとClaude Code用のスキルを追加" && git push
+```
+
+### 5. デプロイが動くことを確認する
+1台ずつ実行する。deploy.shはサーバ上で `git reset --hard` するので、手順3で差分が残っているホストには実行しない。
+
+```
+./deploy.sh main isu1
+```
+
+成功したら、そのホストで次を確認する。
+```
+ssh isu1 "systemctl is-active nginx mysql <APP_SERVICE>; cd /home/isucon/webapp && git log -1 --oneline && git status --short"
+ssh isu1 "curl -sk -o /dev/null -w '%{http_code}\n' http://localhost/"   # nginxがTLSのみなら https://localhost/
+```
+
+- 3つとも `active`、`git log` が手元の最新コミット、`git status` が空、HTTPステータスが200系/300系であればOK
+- isu2, isu3 にも同様に実行する
+- 失敗したら、どこで止まったか (git / 設定反映 / `nginx -t` / go build / サービス起動) を特定して報告する。deploy.shは途中で失敗するとサービスが停止したままになるので、原因を直して再実行するか、`sudo systemctl start` で戻す
+- 最後にユーザーへ「ポータルからisu1にベンチを流して、初期スコアと同程度で通るか確認してください」と伝える (ベンチはClaudeからは実行できない)
+
+### 6. 報告する
 次をまとめてユーザーに出力する。
 - 環境調査の結果 (OS, CPU, メモリ, 言語, DB, サービス名, アプリのポート)
 - リポジトリの構成と、.gitignore で除外したもの
 - isu2/isu3 の差分の有無
-- isucon-toolsの `script/deploy.sh` / `script/bench-capture.sh` / `etc/*` のTODOに入れるべき値 (サービス名、バイナリ名、パス)
+- 各ホストのデプロイ結果
+- `script/bench-capture.sh` / isucon-toolsの `etc/*` (秘伝のタレ) のTODOに入れるべき値 (サービス名、バイナリ名、パス)
 
 ## 守ること
-- `/etc` 配下の設定を書き換えない。サービスの再起動もしない (このスキルは記録だけ)
-- `git reset --hard`、`git clean`、`git push --force` を使わない
+- 手順1〜4では `/etc` 配下の設定を書き換えない。サービスの再起動もしない (反映は手順5のdeploy.shだけで行う)
+- deploy.sh以外で `git reset --hard`、`git clean`、`git push --force` を使わない
+- 秘伝のタレ (isucon-toolsの `etc/*`) の適用はこのスキルではしない。初期状態のままデプロイが通ることだけを確認する
 - 秘密鍵をサーバにコピーしない (GitHubへはForwardAgentで認証する)
 - 想定外の状況ではその場で止まってユーザーに確認する
