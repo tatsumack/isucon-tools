@@ -9,7 +9,7 @@ description: ISUCONでベンチマーク実行中のサーバを計測し、終�
 DBを別ホストに分離している場合は `isu1 db=isu3` のようにDBホストも渡される。
 
 ## 前提
-- 対象サーバに `~/bench-capture.sh` が置かれ、TODOが埋まっていること (isucon-toolsの `script/bench-capture.sh`)
+- リポジトリ直下の `bench-capture.sh` (isucon-toolsの `script/bench-capture.sh`) のTODOが埋まっていて、deploy.shで対象サーバに配布されていること
 - アプリに `net/http/pprof` が仕込まれていること (無くてもalp/slow logだけで分析する)
 
 ## 手順
@@ -18,7 +18,7 @@ DBを別ホストに分離している場合は `isu1 db=isu3` のようにDBホ
 次のコマンドを **`run_in_background: true` で** 実行し、すぐにユーザーへ「計測を開始しました。ベンチを開始してください」と伝える。
 
 ```
-ssh <host> ./bench-capture.sh 70
+ssh <host> /home/isucon/webapp/bench-capture.sh 70   # deploy.shのPROJECT_ROOTに合わせる
 ```
 
 - 計測はベンチより少し長い70秒。ベンチ時間が違う場合はユーザーの指示に合わせる

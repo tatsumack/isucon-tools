@@ -66,9 +66,7 @@
 - [ ] キーになる関数があれば特定する
 - [ ] pprofを仕込む https://github.com/tatsumack/isucon-tools/blob/master/cmd/pprof
 - [ ] ベンチ分析をClaudeに任せられるようにする
-  - [ ] `script/bench-capture.sh` のTODOを埋めて各サーバの `~/bench-capture.sh` に置く
-  - [ ] `dot/claude/skills/bench-analyze/` を当日リポジトリの `.claude/skills/` にコピーする
-  - [ ] `bench-results/` を `.gitignore` に入れる
+  - [ ] 当日リポジトリの `bench-capture.sh` のTODOを埋めてdeploy.shで配布する (スキル・`.gitignore` は当日リポジトリに準備済み)
   - 使い方: Claudeに `/bench-analyze isu1` → 「計測を開始しました」と出たらベンチを開始
 
 ## アプリケーション担当2
