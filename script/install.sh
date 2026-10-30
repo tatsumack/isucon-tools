@@ -1,30 +1,29 @@
 #!/bin/sh
 set -ex
 
-sudo apt-get install -y dstat unzip graphviz
+ARCH=$(dpkg --print-architecture) # amd64 or arm64
+
+sudo apt-get update
+sudo apt-get install -y unzip graphviz sysstat percona-toolkit # pt-query-digestは/usr/binに入る
+
+# dstat: Ubuntu 24.04にはパッケージが無いので失敗しても続行する(代わりにsysstatのvmstat/iostat/sarを使う)
+sudo apt-get install -y dstat || echo "dstat is not available. use vmstat/iostat instead."
 
 # alp
-cd /var/tmp/ && wget https://github.com/tkuchiki/alp/releases/download/v0.4.0/alp_linux_amd64.zip
-unzip alp_linux_amd64.zip
+ALP_VERSION=1.0.22
+cd /var/tmp && wget -q https://github.com/tkuchiki/alp/releases/download/v${ALP_VERSION}/alp_linux_${ARCH}.tar.gz
+tar -zxf alp_linux_${ARCH}.tar.gz alp
 sudo mv ./alp /usr/local/bin
 
-# pt-query-digest
-cd /var/tmp && wget https://www.percona.com/downloads/percona-toolkit/3.0.13/binary/tarball/percona-toolkit-3.0.13_x86_64.tar.gz
-tar -zxvf percona-toolkit-3.0.13_x86_64.tar.gz
-sudo mv ./percona-toolkit-3.0.13/bin/pt-query-digest /usr/local/bin
-
-# slackcat
-cd /var/tmp && wget https://github.com/bcicen/slackcat/releases/download/v1.6/slackcat-1.6-linux-amd64
-sudo mv slackcat-1.6-linux-amd64 /usr/local/bin/slackcat
-sudo chmod +x /usr/local/bin/slackcat
-
 # ssh
-cat << _EOS > /tmp/authorized_keys
-ssh-rsa hoge
-_EOS
+# TODO: GitHubアカウント名に置き換える (https://github.com/<user>.keys で公開鍵を取得)
+GITHUB_USERS=""
 sudo mkdir -p /home/isucon/.ssh
-chmod 700 /home/isucon/.ssh
-sudo cat /tmp/authorized_keys >> /home/isucon/.ssh/authorized_keys
-sudo mv /tmp/authorized_keys /home/isucon/.ssh/
-sudo chown -R isucon.isucon /home/isucon/.ssh/
+sudo touch /home/isucon/.ssh/authorized_keys
+for GITHUB_USER in $GITHUB_USERS
+do
+    curl -fsSL https://github.com/${GITHUB_USER}.keys | sudo tee -a /home/isucon/.ssh/authorized_keys > /dev/null
+done
+sudo chown -R isucon:isucon /home/isucon/.ssh/
+sudo chmod 700 /home/isucon/.ssh
 sudo chmod 600 /home/isucon/.ssh/authorized_keys

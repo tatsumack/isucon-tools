@@ -14,9 +14,15 @@
 - [ ] access_logをltsvにする
 - [ ] alp, slowqueryの計測する
 - [ ] デプロイスクリプトを使えるようにする 
-  - https://github.com/tatsumack/isucon-preparation/blob/master/script/deploy.sh
+  - https://github.com/tatsumack/isucon-tools/blob/master/script/deploy.sh
 - [ ] 秘伝のタレを適用する
 - [ ] ハードウェアの構成を調べる(CPU、メモリ)
+- [ ] 環境を確認してdeploy.sh/nginx.conf/my.cnfのTODOを埋める
+  - OSバージョン/アーキテクチャ(`cat /etc/os-release`, `dpkg --print-architecture`)
+  - Goのバージョンとパス(`which go`)
+  - MySQLかMariaDBか(`mysql --version`)とslow logの設定場所
+  - アプリのsystemdサービス名(`systemctl list-units --type=service | grep isu`)とポート
+  - nginxでTLS終端しているか(`listen 443 ssl`)
 - [ ] 動作しているプロセスを確認しておおよその構成を理解する
 - [ ] SEE ALSO: https://gist.github.com/south37/d4a5a8158f49e067237c17d13ecab12a
 
@@ -27,7 +33,7 @@
 - [ ] パスの一覧を共有
 - [ ] スキーマ一覧を共有
 - [ ] キーになる関数があれば特定する
-- [ ] Cloud Profiler仕込む
+- [ ] pprofを仕込む https://github.com/tatsumack/isucon-tools/blob/master/cmd/pprof
 
 ## アプリケーション担当2
 - [ ] ローカルで開発環境を構築(30分以上かかるなら諦める)

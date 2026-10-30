@@ -1,4 +1,5 @@
-go get -u github.com/google/pprof
+go install github.com/google/pprof@latest
+# または go tool pprof でも可
 
 ```
 _ "net/http/pprof"
@@ -10,9 +11,9 @@ func main() {
     }()
 ```
 
-//ベンチ実行直前に
-pprof -http=localhost:8080 /home/isucon/torb/webapp/go/torb http://localhost:6060/debug/pprof/profile?seconds=60 &
+//ベンチ実行直前に (バイナリのパスは当日のものに置き換える)
+pprof -http=localhost:8080 /home/isucon/webapp/go/<binary> http://localhost:6060/debug/pprof/profile?seconds=60 &
 
 //ベンチ後
-pprof /home/isucon/torb/webapp/go/torb /home/isucon/pprof/pprof.torb.samples.cpu.001.pb.gz
+pprof /home/isucon/webapp/go/<binary> /home/isucon/pprof/pprof.<binary>.samples.cpu.001.pb.gz
 peek main. -cum
